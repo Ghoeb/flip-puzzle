@@ -4,29 +4,6 @@
 #include <string.h>
 #include "../watcher/watcher.h"
 
-/****************************************************************************/
-/*                                Operaciones                               */
-/****************************************************************************/
-
-/* Máscara para obtener el primer bit del byte de operaciones */
-#define ROW_MASK 0b10000000
-/* Máscara para obtener los últimos 7 bits del byte de operaciones */
-#define IDX_MASK 0b01111111
-
-/* El indice de una operacion son sus ultimos 7 bytes */
-#define INDEX(op) ((op) & IDX_MASK)
-/* Si tiene un 1 en el primer bit, entonces la operacion es de fila */
-#define ISROW(op) (((op) & ROW_MASK) == ROW_MASK)
-
-/** La operacion de hacer flip de la fila i */
-#define ROWOP(i) (ROW_MASK | (i))
-/** La operacion de hacer flip de la columna i */
-#define COLOP(i) (0 | (i))
-
-/****************************************************************************/
-/*                                Funciones                                 */
-/****************************************************************************/
-
 /** Lee el estado inicial e inicializa las variables globales y el watcher */
 State state_init(char* filename)
 {
@@ -68,11 +45,11 @@ State state_init(char* filename)
 	op_count = 0;
 	for(uint8_t row = 0; row < height; row++)
 	{
-		operations[op_count++] = ROWOP(row);
+		operations[op_count++] = (Operation){.type = flip_row, .index = row};
 	}
 	for(uint8_t col = 0; col < width; col++)
 	{
-		operations[op_count++] = COLOP(col);
+		operations[op_count++] = (Operation){.type = flip_col, .index = col};
 	}
 
 	return state;
@@ -137,18 +114,13 @@ State state_next (State parent, Operation op)
 	/** Inicializa el contenedor de las filas */
 	State son = calloc(height, sizeof(uint8_t*));
 
-	/* Obtiene el índice de la operación */
-	uint8_t index = INDEX(op);
-
-	/* Si el primer bit no es 0, entonces es flip row */
-	if(ISROW(op))
+	if(op.type == flip_row)
 	{
-		state_flip_row(parent, son, index);
+		state_flip_row(parent, son, op.index);
 	}
-	/* Sino, es flip col */
 	else
 	{
-		state_flip_col(parent, son, index);
+		state_flip_col(parent, son, op.index);
 	}
 
 	return son;
@@ -195,28 +167,6 @@ State state_clone (State dolly)
 
 	return clone;
 }
-
-/******************************** Watcher ***********************************/
-
-/** Visualiza la operacion en el watcher */
-void  operation_watch(Operation op)
-{
-	/* Obtiene el índice de la operación */
-	uint8_t index = INDEX(op);
-
-	/* Si el primer bit no es 0, entonces es flip row */
-	if(ISROW(op))
-	{
-		watcher_flip_row(index);
-	}
-	/* Sino, es flip col */
-	else
-	{
-		watcher_flip_col(index);
-	}
-}
-
-/****************************** Destructores ********************************/
 
 /** Libera los recursos asociados a este estado */
 void  state_destroy(State state)

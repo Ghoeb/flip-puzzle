@@ -1,18 +1,18 @@
 #pragma once
 
+#include "../state/operation.h"
+
 /****************************************************************************/
 /*                                Watcher                                   */
 /*                                                                          */
-/* Módulo a cargo de la visualización del problema.                         */
+/* The module in charge of problem visualization                            */
 /****************************************************************************/
 
-/** Abre una ventana para mostrar una imagen sobre la matriz dada */
+/** Opens a window to show an image over the given matrix */
 void watcher_open     (char* img_file, int matrix_height, int matrix_width);
-/** Visualiza en la ventana la inversión de una fila */
-void watcher_flip_row (int row);
-/** Visualiza en la ventana la inversión de una columna */
-void watcher_flip_col (int col);
-/** Genera una imagen PNG con el contenido actual de la ventana */
+/** Visualizes the operation on the window */
+void watcher_operate  (Operation op);
+/** Generates a PNG image with the current content of the window */
 void watcher_snapshot (char* filename);
-/** Cierra y libera los recursos de la ventana */
+/** Closes the window and frees its resources */
 void watcher_close    ();

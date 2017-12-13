@@ -10,7 +10,7 @@ void follow_your_dreams(HashNode* hn)
 	if(hn -> parent)
 	{
 		follow_your_dreams(hn -> parent);
-		operation_watch(hn -> op);
+		watcher_operate(hn -> op);
 	}
 }
 

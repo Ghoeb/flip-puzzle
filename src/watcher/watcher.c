@@ -21,28 +21,13 @@ void watcher_open(char* img_file, int matrix_height, int matrix_width)
 	watcher = popen(command, "w");
 }
 
-/** Visualiza en la ventana la inversión de una fila */
-void watcher_flip_row (int row)
-{
-	if(watcher)
-	{
-		if(fprintf(watcher, "R %d\n", row) < 0)
-		{
-			watcher_close();
-		}
-		else
-		{
-			fflush(watcher);
-		}
-	}
-}
 
-/** Visualiza en la ventana la inversión de una columna */
-void watcher_flip_col (int col)
+/** Visualizes the operation on the window */
+void watcher_operate  (Operation op)
 {
 	if(watcher)
 	{
-		if(fprintf(watcher, "C %d\n", col) < 0)
+		if(fprintf(watcher, "%c %hhu\n", op.type, op.index) < 0)
 		{
 			watcher_close();
 		}

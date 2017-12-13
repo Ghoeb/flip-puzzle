@@ -4,20 +4,6 @@
 #include "random/pcg_basic.h"
 #include "../watcher/watcher.h"
 
-/* Máscara para obtener el primer bit del byte de operaciones */
-#define ROW_MASK 0b10000000
-/* Máscara para obtener los últimos 7 bits del byte de operaciones */
-#define IDX_MASK 0b01111111
-/** La operacion de hacer flip de la fila i */
-#define ROWOP(i) (ROW_MASK | (i))
-/** La operacion de hacer flip de la columna i */
-#define COLOP(i) (0 | (i))
-/* El indice de una operacion son sus ultimos 7 bytes */
-#define INDEX(op) ((op) & IDX_MASK)
-/* Si tiene un 1 en el primer bit, entonces la operacion es de fila */
-#define ISROW(op) (((op) & ROW_MASK) == ROW_MASK)
-
-
 int main(int argc, char **argv)
 {
 	if(argc != 7)
@@ -56,12 +42,13 @@ int main(int argc, char **argv)
 	op_count = 0;
 	for(uint8_t row = 0; row < height; row++)
 	{
-		operations[op_count++] = ROWOP(row);
+		operations[op_count++] = (Operation){.type = flip_row, .index = row};
 	}
 	for(uint8_t col = 0; col < width; col++)
 	{
-		operations[op_count++] = COLOP(col);
+		operations[op_count++] = (Operation){.type = flip_col, .index = col};
 	}
+
 
 	State actual = calloc(height, sizeof(uint8_t*));
 
@@ -82,7 +69,7 @@ int main(int argc, char **argv)
 		state_destroy(actual);
 		actual = next;
 
-		operation_watch(op);
+		watcher_operate(op);
 	}
 	for(uint8_t row = 0; row < height; row++)
 	{
