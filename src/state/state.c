@@ -4,6 +4,8 @@
 #include <string.h>
 #include "../watcher/watcher.h"
 
+State temp;
+
 /** Lee el estado inicial e inicializa las variables globales y el watcher */
 State state_init(char* filename)
 {
@@ -39,6 +41,12 @@ State state_init(char* filename)
 
 	fclose(f);
 
+	temp = calloc(height, sizeof(uint8_t*));
+	for(uint8_t row = 0; row < height; row++)
+	{
+		temp[row] = calloc(width, sizeof(uint8_t));
+	}
+
 	/* Inicializa la lista de operaciones */
 	operations = calloc(height + width, sizeof(Operation));
 
@@ -62,9 +70,6 @@ void state_flip_row(State parent, State son, uint8_t flip_row)
 {
 	for(uint8_t row = 0; row < height; row++)
 	{
-		/* Inicializa nueva memoria para guardar las filas */
-		son[row] = calloc(width, sizeof(uint8_t));
-
 		/* La fila afectada */
 		if(row == flip_row)
 		{
@@ -88,9 +93,6 @@ void state_flip_col(State parent, State son, uint8_t flip_col)
 {
 	for(uint8_t row = 0; row < height; row++)
 	{
-		/* Inicializa nueva memoria para guardar las filas */
-		son[row] = calloc(width, sizeof(uint8_t));
-
 		for(uint8_t col = 0; col < width; col++)
 		{
 			/* La columna afectada se invierte */
@@ -109,21 +111,33 @@ void state_flip_col(State parent, State son, uint8_t flip_col)
 }
 
 /** Obtiene el estado producto de aplicar una operación */
-State state_next (State parent, Operation op)
+State state_next_temp (State parent, Operation op)
 {
-	/** Inicializa el contenedor de las filas */
-	State son = calloc(height, sizeof(uint8_t*));
-
 	if(op.type == flip_row)
 	{
-		state_flip_row(parent, son, op.index);
+		state_flip_row(parent, temp, op.index);
 	}
 	else
 	{
-		state_flip_col(parent, son, op.index);
+		state_flip_col(parent, temp, op.index);
 	}
 
-	return son;
+	return temp;
+}
+
+/** Gets a permanent copy of the given state */
+State state_consolidate (State state)
+{
+	State perm = calloc(height, sizeof(uint8_t*));
+	for(int row = 0; row < height; row++)
+	{
+		perm[row] = calloc(width, sizeof(uint8_t));
+		for(int col = 0; col < width; col++)
+		{
+			perm[row][col] = state[row][col];
+		}
+	}
+	return perm;
 }
 
 /********************************* Útiles ***********************************/
@@ -181,5 +195,11 @@ void  state_destroy(State state)
 /** Libera todos los recursos de la lista de operaciones */
 void  operations_destroy()
 {
+	for(uint8_t row = 0; row < height; row++)
+	{
+		free(temp[row]);
+	}
+	free(temp);
+
 	free(operations);
 }

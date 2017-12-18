@@ -53,7 +53,7 @@ HashNode* solve(State initial, HashTable* ht)
 		for(int i = 0; i < op_count; i++)
 		{
 			/* Comienza la gestación del hijo de este estado */
-			State fetus = state_next(parent -> state, operations[i]);
+			State fetus = state_next_temp(parent -> state, operations[i]);
 
 			/* Se intenta incluir en la lista de la existencia  */
 			HashNode* son = hash_table_insert(ht, fetus, hash_state(fetus));
@@ -62,6 +62,7 @@ HashNode* solve(State initial, HashTable* ht)
 			if(son)
 			{
 				/* Se establecen los vínculos */
+				son -> state = state_consolidate(fetus);
 				son -> parent = parent;
 				son -> op = operations[i];
 				son -> depth = parent -> depth + 1;
@@ -71,12 +72,6 @@ HashNode* solve(State initial, HashTable* ht)
 
 				/* Se ingresa a la cola de prioridades */
 				heap_insert(heap, son, priority);
-			}
-			/* Sino */
-			else
-			{
-				/* Se limpian sus restos */
-				state_destroy(fetus);
 			}
 		}
 	}

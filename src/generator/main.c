@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 	{
 		Operation op = operations[pcg32_boundedrand(op_count)];
 
-		State next = state_next(actual, op);
+		State next = state_consolidate(state_next_temp(actual, op));
 		state_destroy(actual);
 		actual = next;
 
