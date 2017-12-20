@@ -4,3 +4,4 @@ obj
 /beholder
 /*.png
 /*.txt
+/*.out.*
