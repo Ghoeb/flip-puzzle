@@ -1,7 +1,7 @@
 #include "../state/state.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "random/pcg_basic.h"
+#include "../random/pcg_basic.h"
 #include "../watcher/watcher.h"
 
 int main(int argc, char **argv)

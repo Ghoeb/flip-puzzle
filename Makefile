@@ -44,7 +44,7 @@ LIB=$(GTK) $(MTH)
 ###############################################################################
 
 # Directorios con elementos de uso común
-COMMON=state hash watcher
+COMMON=state hash watcher random
 
 # Directorios que serán compilados a un programa
 PROGRAMS=beholder solver generator

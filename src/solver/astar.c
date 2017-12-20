@@ -55,8 +55,11 @@ HashNode* solve(State initial, HashTable* ht)
 			/* Comienza la gestación del hijo de este estado */
 			State fetus = state_next_temp(parent -> state, operations[i]);
 
+			/** Computes the hash of this state */
+			uint64_t hash_value = hash_state(fetus);
+
 			/* Se intenta incluir en la lista de la existencia  */
-			HashNode* son = hash_table_insert(ht, fetus, hash_state(fetus));
+			HashNode* son = hash_table_insert(ht, fetus, hash_value);
 
 			/* Si efectivamente llegó a término */
 			if(son)

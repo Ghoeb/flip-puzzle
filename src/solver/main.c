@@ -7,10 +7,16 @@
 
 void follow_your_dreams(HashNode* hn)
 {
+	static int steps = 0;
 	if(hn -> parent)
 	{
+		steps++;
 		follow_your_dreams(hn -> parent);
 		watcher_operate(hn -> op);
+	}
+	else
+	{
+		printf("Solución encontrada en %d pasos\n", steps);
 	}
 }
 
